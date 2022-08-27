@@ -4,7 +4,7 @@ World Cup DATA EXPLORATION
 SKILLS USED: JOINS, TEMP TABLES, WINDOWS FUNCTIONS, AGGREGATE FUNCTIONS, CREATING VIEWS
 */
 
--- To view each file uploaded. There are three files (World_cup, Worldcup_players, Worldcup _matches) from Kaggle
+--- To view each file uploaded. There are three files (World_cup, Worldcup_players, Worldcup _matches) from Kaggle
 
 -- First World_cup file shows the year,country where games are held at, 1st/2nd/3rd/4th positions, total goals scored in the world cup, number of qualified teams, 
 -- matches played in the tournament and attendance for the world cup (Date-time is in varchar to take note)
