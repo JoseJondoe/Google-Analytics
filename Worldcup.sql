@@ -6,9 +6,10 @@ SKILLS USED: JOINS, TEMP TABLES, WINDOWS FUNCTIONS, AGGREGATE FUNCTIONS, CREATIN
 
 --- To view each file uploaded. There are three files (World_cup, Worldcup_players, Worldcup _matches) from Kaggle
 
--- First World_cup file shows the year,country where games are held at, 1st/2nd/3rd/4th positions, total goals scored in the world cup, number of qualified teams, 
--- matches played in the tournament and attendance for the world cup (Date-time is in varchar to take note)
+--- First World_cup file shows the year,country where games are held at, 1st/2nd/3rd/4th positions, total goals scored in the world cup, number of qualified teams, 
+--- matches played in the tournament and attendance for the world cup (Date-time is in varchar to take note)
 
+-- Firstly to create a schema for the dataset
 
 CREATE SCHEMA worldcupseries;
 
@@ -16,6 +17,9 @@ SHOW VARIABLES LIKE "Local_infile";
 SET GLOBAL Local_infile = 1;
 
 USE worldcupseries;
+
+
+-- Create a first table for one of the csv files
 
 CREATE TABLE worldcupresults(
 	worldcup_year INT,
@@ -35,7 +39,14 @@ INTO TABLE worldcupresults
 FIELDS TERMINATED BY ','
 IGNORE 1 rows;
 
+
+-- To check if loaded correctly and data in the table.
+
 SELECT * FROM worldcupresults;
+
+
+-- Subsequent 2 dataset (csv files) were uploaded using the import wizard function in MYSQL workbench.
+
 
 -- Worldcup_players file shows MatchID, Team_initials,Coach_name and Player_name
 
@@ -44,6 +55,7 @@ SELECT
 FROM
     worldcup_players
 LIMIT 500000;
+
 
 -- worldcup_players table has column with spacing which may pose an issue hence to rename them by adding underscore
 
@@ -55,6 +67,7 @@ RENAME COLUMN `Line-up` TO line_up,
 RENAME COLUMN `Shirt Number` TO shirt_number,
 RENAME COLUMN `Player Name` TO player_name;
 
+
 -- To confirm the changes made to worldcup_players
 
 SELECT 
@@ -62,6 +75,7 @@ SELECT
 FROM
     worldcup_players
 LIMIT 500000;
+
 
 -- Worldcup_matches file shows the year,datetime of the matches, stages of the game, stadium, city, Home & Away Team Name, Home & Away Team Goals,
 -- Win conditions, attendance for each match, Half-time Home and Away goals, Referee, Assistant 1 & 2, RoundID, MatchId, Home & Away team initials.
@@ -73,6 +87,7 @@ FROM
     worldcup_matches
 LIMIT 500000;
 
+
 -- To check if there are any duplicates in players for any given match (755 rows of duplicates)
 
 SELECT 
@@ -83,6 +98,7 @@ GROUP BY MatchID , Player_Name
 HAVING NumDuplicates > 1
 LIMIT 5000000;
 
+
 -- To check if there are any duplicates in matches by checking against MatchID (unique key) (16 rows of duplicates)
 
 SELECT 
@@ -91,6 +107,7 @@ FROM
     worldcup_matches
 GROUP BY MatchID
 HAVING NumDuplicates > 1;
+
 
 -- To remove duplicates, we set up temp tables which all work will be done on. (3 temp tables to be set up for the 3 files)
 
@@ -111,6 +128,7 @@ SELECT
     *
 FROM
     temp_wc;
+
 
 -- Second temp table for World_cup_players (WCP)
 
@@ -139,6 +157,7 @@ FROM
     project.temp_wcp
 GROUP BY MatchID , Player_Name
 HAVING NumDuplicates > 1;
+
 
 -- Third temp table for Worldcupmatches (WCM)
 
@@ -184,6 +203,7 @@ SET    away_team_name =
 		END
 WHERE  MatchID IN (198, 364,300186477,300186511);
 
+
 -- To check if data is updated
 
 SELECT 
@@ -206,13 +226,15 @@ FROM
 GROUP BY MatchID
 HAVING NumDuplicates > 1;
 
+
 -- Check City name for weird symbols as noticed
 
 SELECT DISTINCT
     City
 FROM
     temp_wcm;
-    
+
+
 -- Update weird temp_wcm_city data
 
 UPDATE temp_wcm
@@ -236,12 +258,14 @@ SET    City =
        END
 WHERE  MatchID IN (1386, 1423, 1385, 2181, 2066, 2065, 1995, 2182, 833, 834, 1055,1323 , 1389, 1422, 1392);
 
+
 -- Recheck City name for weird symbols (None)
 
 SELECT DISTINCT
     City
 FROM
     temp_wcm;
+
 
 -- Temp_WCM table has column with spacing which may pose an issue hence to rename them by adding underscore
 
@@ -264,7 +288,8 @@ SELECT
     *
 FROM
     temp_wcm;
-    
+
+
 -- To view number of time a country has won the world cup (Brazil with highest 5 World Cup)
 
 SELECT 
@@ -273,6 +298,7 @@ FROM
     temp_wc
 GROUP BY winner
 ORDER BY COUNT(*) DESC;
+
 
 -- Notice that due to war, Germany had west and east during a certain period of time, hence to change Germany FR to Germany
 
@@ -306,6 +332,7 @@ SET
 WHERE
 	Fourth = 'Germany FR';
 
+
 -- To confirm changes has been made to the country Germany
 SELECT 
     *
@@ -319,7 +346,8 @@ SELECT
     ROUND(CAST(AVG(GoalsScored) AS DECIMAL)) AS Average_Goals_Scored
 FROM
     temp_wc;
-    
+
+
 -- To show which years had the min and max goals scored and the max/min goals (171 and 70 goals over 4 years, 1930/1934/1998/2014)
 
 SELECT 
@@ -340,7 +368,8 @@ WHERE
             MIN(GoalsScored)
         FROM
             temp_wc);
-            
+
+
 -- To count number of time a country has won, came 2nd/3rd or 4th (Not the best solution as it is ambigous but does the job)          
 
 SELECT
@@ -387,7 +416,8 @@ SELECT
     *
 FROM
     worldcup;
-    
+
+
 -- To insert the participating countries in the World Cup
 
 INSERT INTO worldcup(Country)
@@ -395,6 +425,7 @@ SELECT
    DISTINCT `Home Team Name`
 FROM 
    worldcup_matches;
+
 
 -- To update the worldcup table with info of winner,runners_up,third and fourth counts
 
@@ -415,13 +446,15 @@ GROUP BY ctry) AS rs
      wc.Runner_up_Count=rs.Runners_up_Count,
      wc.Third_count=rs.Third_count,
      wc.Fourth_Count=rs.Fourth_Count;
-     
+
+
 -- To view the updated table (a few nulls)
 
 SELECT 
     *
 FROM
     worldcup;    
+
 
 -- To view the NULL value replaced with 0 without updating the table
 
@@ -433,7 +466,8 @@ SELECT
     IFNULL(Fourth_count, 0) AS Fourth_count
 FROM
     worldcup;
-    
+ 
+ 
 -- Unable to get accurate players participation as dataset includes playes as sub but did not play (Hence unusable data)
 
 SELECT 
@@ -442,6 +476,7 @@ FROM
     temp_wcp
 GROUP BY Player_Name
 ORDER BY Player_Appearance DESC;
+
 
 -- Calculate sum of all attendance in world cup match held from 1930 -2014 (35,985,238 total attendance)
 
@@ -463,6 +498,7 @@ From
 GROUP BY worldcup_year
 ORDER BY Percentage_peryear_total DESC;
 
+
 -- Using CTE to left Join for two tables. MYSQL CTE requires select to be used immediately after the CTE syntax (inflexible) as compared to SQL Server
 
 WITH temp_CTE AS
@@ -483,7 +519,8 @@ FROM
     project.temp_wc ON temp_wc.worldcup_year = temp_wcm.wcm_year)
     SELECT *
     FROM temp_CTE;
-    
+
+
 -- Create view for dashboard
 
 DROP VIEW IF EXISTS dashboard;
@@ -503,20 +540,23 @@ CREATE VIEW dashboard AS
             LEFT JOIN
         project.temp_wc ON temp_wcm.wcm_year = temp_wc.worldcup_year;
 
+
 -- View dashboard data
 
 SELECT 
     *
 FROM
     dashboard;
-    
+
+
 -- To see if view dashboard works
 
 SELECT DISTINCT
     (worldcup_match_city)
 FROM
     dashboard;
-    
+
+
 -- Count of distinct city world cup matches played at (151 cities)
 
 SELECT 
@@ -537,6 +577,7 @@ WHERE
         FROM
             dashboard);
 
+
 -- Checking if Worldcup attendance tally with sum of all match attendance
 
 SELECT 
@@ -544,6 +585,7 @@ SELECT
 FROM
     dashboard
 GROUP BY worldcup_year;
+
 
 -- To confirm if 2014 had difference of sum match attendance in the year against calculated world cup attendance of the year (There is a discrepancy)
 
@@ -555,7 +597,8 @@ FROM
     dashboard
 WHERE
     worldcup_year = '2014';
-    
+
+
 -- values for Worldcup_results for row 2, 3 and 6 missing zeros
     
 UPDATE temp_wc
@@ -567,13 +610,15 @@ SET    Attendance =
        END
 WHERE  temp_wc.worldcup_year IN (1934, 1938, 1958);
 
+
 -- Checking the update has been successful
 
 SELECT 
     *
 FROM
     temp_wc;
-    
+
+
 -- Drop view to create new view
 
 DROP VIEW dashboard;
@@ -585,5 +630,6 @@ SELECT
     *
 FROM
     dashboard;
-    
+
+
 -- Create new view with all three tables combine
