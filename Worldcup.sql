@@ -514,9 +514,9 @@ WITH temp_CTE AS
     temp_wc.Attendance AS 'worldcup_attendance',
     MatchID AS 'match_id'
 FROM
-    project.temp_wcm
+    temp_wcm
         LEFT JOIN
-    project.temp_wc ON temp_wc.worldcup_year = temp_wcm.wcm_year)
+    temp_wc ON temp_wc.worldcup_year = temp_wcm.wcm_year)
     SELECT *
     FROM temp_CTE;
 
