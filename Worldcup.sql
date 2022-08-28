@@ -536,9 +536,9 @@ CREATE VIEW dashboard AS
         GoalsScored AS 'total-goals-scored',
         temp_wc.Attendance AS 'worldcup_attendance'
     FROM
-        project.temp_wcm
+        temp_wcm
             LEFT JOIN
-        project.temp_wc ON temp_wcm.wcm_year = temp_wc.worldcup_year;
+        temp_wc ON temp_wcm.wcm_year = temp_wc.worldcup_year;
 
 
 -- View dashboard data
