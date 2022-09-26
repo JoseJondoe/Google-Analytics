@@ -498,7 +498,7 @@ GROUP BY worldcup_year
 ORDER BY Percentage_peryear_total DESC;
 
 
------------------------------------- Using CTE to left Join for two tables. MYSQL CTE requires select to be used immediately after the CTE syntax (inflexible) as compared to SQL Server ------------------------------------
+------------------------------------ Using CTE to left Join for two tables.------------------------------------
 
 WITH temp_CTE AS
 (SELECT 
