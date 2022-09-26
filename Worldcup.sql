@@ -498,7 +498,7 @@ GROUP BY worldcup_year
 ORDER BY Percentage_peryear_total DESC;
 
 
------------------------------------- Using CTE to left Join for two tables.------------------------------------
+------------------------------------ Using CTE (Common Table Expression)------------------------------------
 
 WITH temp_CTE AS
 (SELECT 
